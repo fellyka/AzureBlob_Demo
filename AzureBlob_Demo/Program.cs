@@ -1,4 +1,5 @@
 ﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 
 using System;
 
@@ -17,11 +18,16 @@ namespace AzureBlob_Demo
             /* blobServiceClient.CreateBlobContainer(containerName);*/
 
             BlobContainerClient blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
-            BlobClient blobClient = blobContainerClient.GetBlobClient(blobName);
+           /* BlobClient blobClient = blobContainerClient.GetBlobClient(blobName); */
+           /* blobClient.Upload(location);*/
 
-            blobClient.Upload(location);
 
-            Console.WriteLine("Your File has been uploaded to the container !");
+            //After having uploaded items from the Azure portal, let list them here with few of its properties
+            foreach(BlobItem item in blobContainerClient.GetBlobs())
+            {
+                Console.WriteLine($"Item Name: {item.Name}\nItem Tags: {item.Tags}\nItem deleted? :{item.Deleted}");
+                Console.WriteLine();
+            }
             Console.ReadKey();
         }
     }
