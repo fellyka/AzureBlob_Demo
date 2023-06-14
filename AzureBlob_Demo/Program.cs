@@ -3,6 +3,8 @@ using Azure.Storage.Blobs.Models;
 using Azure.Storage.Sas;
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace AzureBlob_Demo
 {
@@ -25,6 +27,14 @@ namespace AzureBlob_Demo
             BlobProperties properties = blobClient.GetProperties();
             Console.WriteLine($"The access tier of the blob is {properties.AccessTier}\n" +
                 $"The size of the blob is {properties.ContentLength}");
+
+            Console.WriteLine();
+            //Get metadata
+            IDictionary<string,string> metadata = properties.Metadata;
+            foreach(var item in  metadata)
+            {
+                Console.WriteLine($"Item Key = {item.Key}\nItem Value = {item.Value}");
+            }
 
             Console.ReadKey();
         }            
