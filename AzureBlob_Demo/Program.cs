@@ -12,6 +12,7 @@ namespace AzureBlob_Demo
         private static string containerName = "vscontainer";
         private static string blobName = "createdfromvs";
         private static string location = @"C:\Users\felly\OneDrive\Desktop\AZ-900-Certificate.pdf";
+        private static string downloadToLocation = @"C:\Users\felly\OneDrive\Desktop\BlobDownload";
         static void Main(string[] args)
         {
             BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
@@ -28,6 +29,13 @@ namespace AzureBlob_Demo
                 Console.WriteLine($"Item Name: {item.Name}\nItem Tags: {item.Tags}\nItem deleted? :{item.Deleted}");
                 Console.WriteLine();
             }
+
+            Console.WriteLine();
+
+            // Download your blob
+            BlobClient blobClient = blobContainerClient.GetBlobClient(blobName);
+            blobClient.DownloadTo(downloadToLocation);
+            Console.WriteLine("Blob has been downloaded");
             Console.ReadKey();
         }
     }
