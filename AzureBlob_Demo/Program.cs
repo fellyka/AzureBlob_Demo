@@ -14,43 +14,19 @@ namespace AzureBlob_Demo
         private static string blobName = "createdfromvs";
         private static string location = @"C:\Users\felly\OneDrive\Desktop\AZ-900-Certificate.pdf";
         private static string downloadToLocation = @"C:\Users\felly\OneDrive\Desktop\BlobDownload";
+
         static void Main(string[] args)
-        {
-            //Generate a Shared Access Signature
-           // GenerateSAS();
-            ReadBlob();
-            Console.WriteLine($"Shared Access Signature Uri generated and resource downloaded in {downloadToLocation}");
-
-
-            Console.ReadKey();
-        }
-
-        public static Uri GenerateSAS()
         {
             BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
             BlobContainerClient blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
             BlobClient blobClient = blobContainerClient.GetBlobClient(blobName);
 
-            BlobSasBuilder builder = new BlobSasBuilder()
-            {
-                BlobContainerName = containerName,
-                BlobName = blobName,
-                //b for Blob
-                Resource = "b" 
-            };
+            //Get Blob properties
+            BlobProperties properties = blobClient.GetProperties();
+            Console.WriteLine($"The access tier of the blob is {properties.AccessTier}\n" +
+                $"The size of the blob is {properties.ContentLength}");
 
-            builder.SetPermissions(BlobSasPermissions.Read | BlobSasPermissions.List);
-            builder.ExpiresOn = DateTimeOffset.UtcNow.AddHours(1);
-
-            return blobClient.GenerateSasUri(builder);
-        }//end of GenerateSAS() method 
-
-        public static void ReadBlob()
-        {
-            Uri blobUri = GenerateSAS();
-            BlobClient client = new BlobClient(blobUri);
-            client.DownloadTo(downloadToLocation);
-
-        }
+            Console.ReadKey();
+        }            
     }
 }
