@@ -1,5 +1,6 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Sas;
 
 using System;
 
@@ -15,28 +16,41 @@ namespace AzureBlob_Demo
         private static string downloadToLocation = @"C:\Users\felly\OneDrive\Desktop\BlobDownload";
         static void Main(string[] args)
         {
-            BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
-            /* blobServiceClient.CreateBlobContainer(containerName);*/
-
-            BlobContainerClient blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
-           /* BlobClient blobClient = blobContainerClient.GetBlobClient(blobName); */
-           /* blobClient.Upload(location);*/
+            //Generate a Shared Access Signature
+           // GenerateSAS();
+            ReadBlob();
+            Console.WriteLine($"Shared Access Signature Uri generated and resource downloaded in {downloadToLocation}");
 
 
-            //After having uploaded items from the Azure portal, let list them here with few of its properties
-            foreach(BlobItem item in blobContainerClient.GetBlobs())
-            {
-                Console.WriteLine($"Item Name: {item.Name}\nItem Tags: {item.Tags}\nItem deleted? :{item.Deleted}");
-                Console.WriteLine();
-            }
-
-            Console.WriteLine();
-
-            // Download your blob
-            BlobClient blobClient = blobContainerClient.GetBlobClient(blobName);
-            blobClient.DownloadTo(downloadToLocation);
-            Console.WriteLine("Blob has been downloaded");
             Console.ReadKey();
+        }
+
+        public static Uri GenerateSAS()
+        {
+            BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
+            BlobContainerClient blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
+            BlobClient blobClient = blobContainerClient.GetBlobClient(blobName);
+
+            BlobSasBuilder builder = new BlobSasBuilder()
+            {
+                BlobContainerName = containerName,
+                BlobName = blobName,
+                //b for Blob
+                Resource = "b" 
+            };
+
+            builder.SetPermissions(BlobSasPermissions.Read | BlobSasPermissions.List);
+            builder.ExpiresOn = DateTimeOffset.UtcNow.AddHours(1);
+
+            return blobClient.GenerateSasUri(builder);
+        }//end of GenerateSAS() method 
+
+        public static void ReadBlob()
+        {
+            Uri blobUri = GenerateSAS();
+            BlobClient client = new BlobClient(blobUri);
+            client.DownloadTo(downloadToLocation);
+
         }
     }
 }
